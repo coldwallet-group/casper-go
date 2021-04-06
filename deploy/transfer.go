@@ -3,7 +3,6 @@ package deploy
 import (
 	"bytes"
 	cl "github/casper-go/clvalue"
-	"github/casper-go/keys"
 	"math/big"
 )
 
@@ -12,8 +11,7 @@ type Transfer struct {
 	RuntimeArgs
 }
 
-func NewTransfer(amount *big.Int, targetKeyHolder keys.KeyHolder, id *big.Int) (*ExecDeployItem, error) {
-	accountHash := targetKeyHolder.AccountHash()
+func NewTransfer(amount *big.Int, accountHash []byte, id *big.Int) (*ExecDeployItem, error) {
 	var idCLvalue *cl.CLValue
 	if id == nil {
 		idCLvalue = cl.NewOptionCLValue(nil, cl.TagU64)

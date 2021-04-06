@@ -177,7 +177,7 @@ func mockSender() (keys.KeyHolder, error) {
 }
 
 func mockTransferSession(recipient keys.KeyHolder) (*ExecDeployItem, error) {
-	session, err := NewTransfer(big.NewInt(2500000000), recipient, nil)
+	session, err := NewTransfer(big.NewInt(2500000000), recipient.AccountHash(), nil)
 	if err != nil {
 		return nil, err
 	}
