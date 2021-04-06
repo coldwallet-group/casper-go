@@ -71,17 +71,3 @@ func NewOptionType(innerType CLType) *OptionType {
 		InnerType:   innerType,
 	}
 }
-
-func (op *OptionType) ToJson() []byte {
-	return nil
-}
-
-//
-//func (o OptionType) MarshalJSON() ([]byte, error) {
-//	fmt.Println("OptionType MarshalJSON...")
-//	return json.Marshal(struct {
-//		Option interface{} `json:"Option"`
-//	}{
-//		Option: map[string]interface{}{o.Type: o.InnerType},
-//	})
-//}

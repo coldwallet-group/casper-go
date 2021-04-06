@@ -107,7 +107,7 @@ func (s *SECP256K1) AccountHash() []byte {
 }
 
 func (s *SECP256K1) AccountHex() string {
-	return AccountHex(s.publicKeyByte, s.prefix)
+	return s.prefix + hex.EncodeToString(ethcrypto.CompressPubkey(s.publicKeyEcdsa))
 }
 
 func (s *SECP256K1) Sign(message []byte) (sig []byte, err error) {
@@ -135,10 +135,12 @@ func (s *SECP256K1) Prefix() string {
 
 func (s *SECP256K1) ParsePrivateKeyToPem() (string, error) {
 	//TODO 尚未从typescript翻译
+	panic("TODO")
 	return "", nil
 }
 
 func (s *SECP256K1) ParsePublicKeyToPem() (string, error) {
 	//TODO 尚未从typescript翻译
+	panic("TODO")
 	return "", nil
 }

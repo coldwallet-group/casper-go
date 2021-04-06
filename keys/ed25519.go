@@ -82,7 +82,7 @@ func (e *ED25519) AccountHash() []byte {
 }
 
 func (e *ED25519) AccountHex() string {
-	return AccountHex(e.pubKey, e.prefix)
+	return e.prefix + hex.EncodeToString(e.pubKey)
 }
 
 func (e *ED25519) Sign(message []byte) (sig []byte, err error) {

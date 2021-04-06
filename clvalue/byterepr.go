@@ -7,6 +7,7 @@ import (
 )
 
 func toByteNumber(bitSize uint32, signed bool, vb []byte) []byte {
+	//TODO signed参数，目前的功能有符号整型暂时未使用，暂不处理
 	var val big.Int
 	val.SetBytes(vb)
 	if val.Cmp(big.NewInt(0)) >= 0 {

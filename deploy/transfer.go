@@ -12,8 +12,7 @@ type Transfer struct {
 	RuntimeArgs
 }
 
-func NewTransfer(amount *big.Int, targetKeyHolder keys.KeyHolder, sourcePurse []byte, id *big.Int) (*ExecDeployItem, error) {
-
+func NewTransfer(amount *big.Int, targetKeyHolder keys.KeyHolder, id *big.Int) (*ExecDeployItem, error) {
 	accountHash := targetKeyHolder.AccountHash()
 	var idCLvalue *cl.CLValue
 	if id == nil {
@@ -27,29 +26,6 @@ func NewTransfer(amount *big.Int, targetKeyHolder keys.KeyHolder, sourcePurse []
 		{"target", cl.NewByteArrayCLValue(accountHash)},
 		{"id", idCLvalue},
 	}
-	//
-	//var argMap []cl.CLMap
-	//argMap = append(argMap, cl.CLMap{
-	//	Name:  "amount",
-	//	Value: cl.NewU512CLValue(amount),
-	//})
-	//accountHash := targetKeyHolder.AccountHash()
-	//argMap = append(argMap, cl.CLMap{
-	//	Name:  "target",
-	//	Value: cl.NewByteArrayCLValue(accountHash),
-	//})
-	//if id == nil {
-	//	argMap = append(argMap, cl.CLMap{
-	//		Name:  "id",
-	//		Value: cl.NewOptionCLValue(nil, cl.TagU64),
-	//	})
-	//} else {
-	//	argMap = append(argMap, cl.CLMap{
-	//		Name:  "id",
-	//		Value: cl.NewOptionCLValue(cl.NewU64(id), cl.TagU64),
-	//	})
-	//}
-
 	return &ExecDeployItem{
 		ItemTrx: &Transfer{
 			Tag: 5,

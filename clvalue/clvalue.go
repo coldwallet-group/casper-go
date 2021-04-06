@@ -37,45 +37,25 @@ func (c CLT) ToJson() []byte {
 	return nil
 }
 
-//
-//func (c CLT) MarshalJSON() ([]byte, error) {
-//	fmt.Println("234234asd...")
-//	//switch v := c; v {
-//	//case TagU64:
-//	//	return "U64"
-//	//case TagU512:
-//	//	return "U512"
-//	//}
-//	return json.Marshal(struct {
-//		ClType interface{} `json:"clType"`
-//	}{
-//		ClType: "U" + strconv.Itoa(int(c)),
-//	})
-//}
-
 type CLType interface {
-	ToJson() []byte
-	//MarshalJSON() ([]byte, error)
 }
+
 type CLValue struct {
-	Value BytesSerializable `json:"-"`
-	Type  CLType            `json:"cl_type,omitempty"`
-	//JSONType interface{}       `json:"clType,omitempty"`
-	ByteHex string `json:"bytes,omitempty"`
-	Parsed  string `json:"parsed,omitempty"`
+	Value   BytesSerializable `json:"-"`
+	Type    CLType            `json:"cl_type,omitempty"`
+	ByteHex string            `json:"bytes,omitempty"`
+	Parsed  string            `json:"parsed,omitempty"`
 }
 
 type BytesSerializable interface {
 	GetCLType() CLType
-	//GetJSONType() interface{}
 	ToBytes() []byte
 }
 
 func NewCLValue(value BytesSerializable) *CLValue {
 	return &CLValue{
-		Value: value,
-		Type:  value.GetCLType(),
-		//JSONType: value.GetJSONType(),
+		Value:   value,
+		Type:    value.GetCLType(),
 		ByteHex: hex.EncodeToString(value.ToBytes()),
 		Parsed:  "null",
 	}
@@ -84,10 +64,6 @@ func NewCLValue(value BytesSerializable) *CLValue {
 func (c *CLValue) GetCLType() interface{} {
 	return c.Value.GetCLType()
 }
-
-//func (c *CLValue) GetJSONType() interface{} {
-//	return c.Value.GetJSONType()
-//}
 
 func (c *CLValue) ToBytes() []byte {
 	helper := ToBytesHelper(c.Type)

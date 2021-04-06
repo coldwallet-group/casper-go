@@ -32,10 +32,6 @@ func (pk *PublicKey) GetCLType() interface{} {
 	return TagPublicKey
 }
 
-//func (pk *PublicKey) GetJSONType() interface{} {
-//	return "PublicKey"
-//}
-
 func (pk *PublicKey) ToBytes() []byte {
 	return byteutil.Concat([]byte{pk.Tag}, ToBytesBytesArray(pk.RawPublicKey))
 }

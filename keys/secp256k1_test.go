@@ -39,10 +39,8 @@ func TestSECP256K1_AccountHex(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	accountHex, err := holder.AccountHex()
-	if err != nil {
-		t.Fatal(err)
-	}
+	accountHex := holder.AccountHex()
+	fmt.Println(accountHex)
 	if 68 != len(accountHex) {
 		t.Errorf("account len error,actual:%d", len(accountHex))
 	}
@@ -77,10 +75,7 @@ func TestSECP256K1_Sign(t *testing.T) {
 	}
 	fmt.Println(hex.EncodeToString(sig))
 
-	verify, err := holder.Verify(msg, sig)
-	if err != nil {
-		t.Fatal(err)
-	}
+	verify := holder.Verify(msg, sig)
 	fmt.Println(verify)
 
 }

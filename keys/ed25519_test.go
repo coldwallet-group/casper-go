@@ -98,10 +98,7 @@ func TestED25519_AccountHex(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	addr, err := holder.AccountHex()
-	if err != nil {
-		t.Fatal(err)
-	}
+	addr := holder.AccountHex()
 	if 66 != len(addr) {
 		t.Fatal("accountHex len error")
 	}
@@ -132,10 +129,7 @@ func TestED25519_Sign(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	verify, err := holderVerify.Verify(msg, sig)
-	if err != nil {
-		t.Fatal(err)
-	}
+	verify := holderVerify.Verify(msg, sig)
 	if !verify {
 		t.Fatal("failed to sign message")
 	}

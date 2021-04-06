@@ -23,10 +23,6 @@ func (nc *U64) GetCLType() CLType {
 	return nc.NumberCoder.GetCLType()
 }
 
-//func (nc *U64) GetJSONType() interface{} {
-//	return "U64"
-//}
-
 func (nc *U64) ToBytes() []byte {
 	return nc.NumberCoder.ToBytes()
 }

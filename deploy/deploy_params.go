@@ -22,7 +22,6 @@ func NewParams(rawPublicKey []byte) *Params {
 		gasPrice:         1,          //从配置文件获取
 		ttl:              3600000,    //从配置文件获取
 		dependencies:     [][]byte{},
-		//timestamp:        uint64(time.Now().Unix()),
-		timestamp: time.Now(),
+		timestamp:        time.Now(),
 	}
 }

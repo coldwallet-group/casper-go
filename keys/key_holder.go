@@ -1,7 +1,6 @@
 package keys
 
 import (
-	"encoding/hex"
 	"errors"
 	"fmt"
 	"github/casper-go/common/byteutil"
@@ -82,9 +81,4 @@ func AccountHash(pub []byte, sa SignatureAlgorithm) []byte {
 	separator := []byte{0}
 	prefix := byteutil.Concat([]byte(strings.ToLower(string(sa))), separator)
 	return blake2b.Hash(byteutil.Concat(prefix, pub))
-}
-
-//根据公钥数据生成accountHex
-func AccountHex(pub []byte, prefix string) string {
-	return prefix + hex.EncodeToString(pub)
 }

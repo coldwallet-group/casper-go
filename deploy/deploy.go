@@ -2,16 +2,11 @@ package deploy
 
 import (
 	"encoding/hex"
-	"fmt"
 	cl "github/casper-go/clvalue"
 	"github/casper-go/common/byteutil"
 	"github/casper-go/keys"
 	"github/casper-go/keys/blake2b"
 )
-
-type Wrap struct {
-	Data Deploy `json:"deploy"`
-}
 
 type Deploy struct {
 	Hash      []byte          `json:"-"`
@@ -33,9 +28,6 @@ func MakeDeploy(params *Params, session *ExecDeployItem, payment *ExecDeployItem
 	header := NewHeader(cl.NewPublicKey(params.accountPublicKey, params.keyAlgorithm), bodyHash, params)
 	headerBytes := serializeHeader(header)
 	deployHash := blake2b.Hash(headerBytes)
-
-	fmt.Printf("Hash:%s \n", hex.EncodeToString(deployHash))
-	fmt.Printf("bodyHash:%s \n", hex.EncodeToString(bodyHash))
 
 	return &Deploy{
 		Hash:      deployHash,

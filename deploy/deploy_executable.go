@@ -9,15 +9,6 @@ type ExecutableDeployer interface {
 	ToBytes() []byte
 }
 
-//
-//func (p *Payment) ToBytes() []byte {
-//	return serializeDeployItem(p.ExecDeployItem)
-//}
-//
-//func (s *Session) ToBytes() []byte {
-//	return serializeDeployItem(s.ExecDeployItem)
-//}
-
 type ExecDeployItem struct {
 	ItemModuleBytes                   *ModuleBytes  `json:"ModuleBytes,omitempty"`
 	ItemStoredContractByHash          *StoredParams `json:"StoredContractByHash,omitempty"`
@@ -37,18 +28,8 @@ func (e *ExecDeployItem) ToBytes() []byte {
 	panic("failed to serialize ExecDeployItem")
 }
 
-//func (e *ExecDeployItem) ToPaymentJSON() *PackageDeployItem {
-//	return &PackageDeployItem{
-//		Module: PackageModuleBytes{
-//		e.ItemModuleBytes.ModuleBytes,
-//				[]interface{}{e.ItemModuleBytes.Args},
-//		},
-//	}
-//}
-
 type RuntimeArgs struct {
 	Args [][2]interface{} `json:"args,omitempty"`
-	//Args *[]cl.CLMap `json:"args,omitempty"`
 }
 
 func (r *RuntimeArgs) ToBytes() []byte {
