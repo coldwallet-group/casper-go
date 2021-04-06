@@ -1,8 +1,6 @@
 package clvalue
 
 import (
-	"bytes"
-	"errors"
 	"math/big"
 	"strconv"
 )
@@ -16,8 +14,8 @@ const (
 //	isBigNumber bool
 //}
 //
-//func BigNumberFrom(value interface{}) (*big.Int, error) {
-//	switch v := value.(type) {
+//func BigNumberFrom(Value interface{}) (*big.Int, error) {
+//	switch v := Value.(type) {
 //	case big.Int:
 //	case *big.Int:
 //		return NewBigNumber(hex.EncodeToString(v.Bytes())), nil
@@ -54,7 +52,7 @@ const (
 //	case int64:
 //		return NewBigNumber(strconv.Itoa(int(v))), nil
 //	}
-//	return nil, errors.New("invalid BigNumber value")
+//	return nil, errors.New("invalid BigNumber Value")
 //}
 //
 //func NewBigNumber(hex string) *big.Int {
@@ -65,63 +63,48 @@ const (
 //}
 
 type NumberCoder struct {
-	clType  int
-	bitSize uint32
-	signed  bool
-	val     *big.Int
-	name    string
+	BitSize uint32
+	Signed  bool
+	Tag     uint8
+	Val     *big.Int
+	Name    string
 }
 
-func NewNumberCoder(clType int, bitSize uint32, signed bool, val interface{}) (*NumberCoder, error) {
-	bigNum, err := numberFrom(val)
-	if err != nil {
-		return nil, err
-	}
-	n := "u"
+func NewNumberCoder(bitSize uint32, tag uint8, signed bool, val interface{}) *NumberCoder {
+	n := "U"
 	if signed {
-		n = "i"
+		n = "I"
 	}
+	//cv := CLValue{
+	//	Value: e,
+	//	CLType: CLType{
+	//		Tag: numTag,
+	//	},
+	//	ByteHex: hex.EncodeToString(toBytes(e.Val, e.BitSize)),
+	//}
 	return &NumberCoder{
-		clType:  clType,
-		bitSize: bitSize,
-		signed:  signed,
-		val:     bigNum,
-		name:    n + strconv.Itoa(int(bitSize)),
-	}, nil
+		BitSize: bitSize,
+		Tag:     tag,
+		Signed:  signed,
+		Val:     NumberFrom(val),
+		Name:    n + strconv.Itoa(int(bitSize)),
+	}
 }
-func (nc *NumberCoder) GetCLType() int {
-	return 0
+
+func (nc *NumberCoder) GetCLType() CLType {
+	//return NumberCoderType{
+	//	Tag:  nc.Tag,
+	//	Name: nc.Name,
+	//}
+	return NumberCoderType(nc.Name)
 }
 
 func (nc *NumberCoder) ToBytes() []byte {
-	vb := nc.val.Bytes()
-	if nc.val.Cmp(big.NewInt(0)) >= 0 {
-		// for positive number, we had to deal with paddings
-		if nc.bitSize > 64 {
-			// for u128, u256, u512, we have to and append extra byte for length
-			r := bytes.Join([][]byte{
-				vb,
-				{byte(len(vb))},
-			}, []byte{})
-			byteReverse(&r)
-			return r
-		} else {
-			// for other types, we have to add padding 0s
-			byteLen := nc.bitSize / 8
-			var b []byte
-			for i := 0; i < int(byteLen)-len(vb); i++ {
-				b = append(b, 0)
-			}
-			byteReverse(&vb)
-			r := bytes.Join([][]byte{
-				vb,
-				b[:],
-			}, []byte{})
-			return r
-		}
-	}
-	byteReverse(&vb)
-	return vb
+	return toBytes(nc.Val, nc.BitSize)
+}
+
+func toBytes(val *big.Int, bitSize uint32) []byte {
+	return toByteNumber(bitSize, false, val.Bytes())
 }
 
 func byteReverse(s *[]byte) {
@@ -130,27 +113,37 @@ func byteReverse(s *[]byte) {
 	}
 }
 
-func numberFrom(value interface{}) (*big.Int, error) {
+func NumberFrom(value interface{}) *big.Int {
 	switch v := value.(type) {
 	case big.Int:
-		return &v, nil
+		return &v
 	case *big.Int:
-		return v, nil
+		return v
 	//case uint, uint8, uint16, uint32, int:
 	//	return big.NewInt(int64(v)), nil
 	case int8:
-		return big.NewInt(int64(v)), nil
+		return big.NewInt(int64(v))
 	case int16:
-		return big.NewInt(int64(v)), nil
+		return big.NewInt(int64(v))
 	case int32:
-		return big.NewInt(int64(v)), nil
+		return big.NewInt(int64(v))
 	case uint32:
-		return big.NewInt(int64(v)), nil
+		return big.NewInt(int64(v))
 	case uint64:
-		i := int64(v)
-		return big.NewInt(i), nil
+		return big.NewInt(int64(v))
 	case int64:
-		return big.NewInt(v), nil
+		return big.NewInt(v)
 	}
-	return nil, errors.New("invalid Number value")
+	return nil
+}
+
+type NumberCoderType string
+
+//{
+//	Tag  uint8  `json:"-"`
+//	Name string `json:"name"`
+//}
+
+func (n NumberCoderType) ToJson() []byte {
+	return nil
 }

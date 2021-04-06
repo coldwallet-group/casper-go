@@ -172,6 +172,13 @@ func (cc *CasperClient) GetBlockState(stateRootHash, key string, path []string) 
 	return &res, nil
 }
 
-func (cc *CasperClient) Transfer() {
-	//todo
+func (cc *CasperClient) PutDeploy(deployJson interface{}) (*model.AccountPutDeploy, error) {
+	var res *model.AccountPutDeploy
+	params := make(map[string]interface{})
+	params["deploy"] = deployJson
+	err := cc.casper.SendRequest("account_put_deploy", &res, params)
+	if err != nil {
+		return nil, fmt.Errorf("rpc account_put_deploy error: %v", err)
+	}
+	return res, nil
 }

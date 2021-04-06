@@ -26,7 +26,12 @@ type ED25519 struct {
 	pubKey []byte
 }
 
-func NewED25519(private []byte, public []byte) *ED25519 {
+func NewED25519(private []byte, public []byte) (*ED25519, error) {
+	if public != nil {
+		if len(public) != 32 {
+			return nil, errors.New("invalid public key length")
+		}
+	}
 	return &ED25519{
 		prefix:      "01",
 		algorithm:   Ed25519,
@@ -34,7 +39,7 @@ func NewED25519(private []byte, public []byte) *ED25519 {
 		privByteLen: 64,
 		privateKey:  private,
 		pubKey:      public,
-	}
+	}, nil
 }
 
 //注意：这里返回的私钥是64字节长度
@@ -72,10 +77,11 @@ func (e *ED25519) PrivateToPubKey() ([]byte, error) {
 	return e.privateKey[32:], nil
 }
 
-func (e *ED25519) AccountHex() (string, error) {
-	if err := CheckPubKey(e.pubKey, e.pubByteLen); err != nil {
-		return "", err
-	}
+func (e *ED25519) AccountHash() []byte {
+	return AccountHash(e.pubKey, e.algorithm)
+}
+
+func (e *ED25519) AccountHex() string {
 	return AccountHex(e.pubKey, e.prefix)
 }
 
@@ -87,12 +93,17 @@ func (e *ED25519) Sign(message []byte) (sig []byte, err error) {
 	return ed25519.Sign(priv, message), nil
 }
 
-func (e *ED25519) Verify(message, sig []byte) (bool, error) {
-	if err := CheckPubKey(e.pubKey, e.pubByteLen); err != nil {
-		return false, err
-	}
+func (e *ED25519) Verify(message, sig []byte) bool {
 	pub := ed25519.PublicKey(e.pubKey)
-	return ed25519.Verify(pub, message, sig), nil
+	return ed25519.Verify(pub, message, sig)
+}
+
+func (e *ED25519) RawPublicKey() []byte {
+	return e.pubKey
+}
+
+func (e *ED25519) Prefix() string {
+	return e.prefix
 }
 
 func (e *ED25519) ParsePrivateKeyToPem() (string, error) {

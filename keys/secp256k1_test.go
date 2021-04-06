@@ -34,7 +34,10 @@ func TestSECP256K1_GenerateKeyBySeed(t *testing.T) {
 
 func TestSECP256K1_AccountHex(t *testing.T) {
 	_, pub := getSECP256K1Key()
-	holder := NewKeyHolder(nil, pub, testSecp256k1)
+	holder, err := NewKeyHolder(nil, pub, testSecp256k1)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	accountHex, err := holder.AccountHex()
 	if err != nil {
@@ -53,7 +56,7 @@ func TestSECP256K1_AccountHex(t *testing.T) {
 
 func TestSECP256K1_ParsePublicKeyToPem(t *testing.T) {
 	_, pub := getSECP256K1Key()
-	holder := NewKeyHolder(nil, pub, testSecp256k1)
+	holder, _ := NewKeyHolder(nil, pub, testSecp256k1)
 	fmt.Println(holder.ParsePublicKeyToPem())
 }
 
@@ -63,7 +66,11 @@ func TestSECP256K1_Sign(t *testing.T) {
 
 	msg := blake2b.Hash([]byte("abcde!!"))
 
-	holder := NewKeyHolder(priv, pub, testSecp256k1)
+	holder, err := NewKeyHolder(priv, pub, testSecp256k1)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	sig, err := holder.Sign(msg)
 	if err != nil {
 		t.Fatal(err)

@@ -5,6 +5,11 @@ type ChainBlock struct {
 	Block      CasperBlock `json:"block"`
 }
 
+type AccountPutDeploy struct {
+	ApiVersion string `json:"api_version"`
+	DeployHash string `json:"deploy_hash"`
+}
+
 type CasperBlock struct {
 	Hash   string            `json:"hash"`
 	Body   CasperBlockBody   `json:"body"`

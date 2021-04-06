@@ -15,9 +15,13 @@ type KeyGenerator interface {
 //根据不同签名算法，生成对应的keyGenerator
 //目前支持ed2519/secp256k1
 func NewKeyGenerator(algorithm SignatureAlgorithm) KeyGenerator {
+	//由于生成密钥操作只是单纯的New对应的实例
+	//并不会执行其他逻辑，所以这里是可以忽略返回的error
 	if algorithm == Secp256K1 {
-		return NewSECP256K1(nil, nil)
+		k, _ := NewSECP256K1(nil, nil)
+		return k
 	} else {
-		return NewED25519(nil, nil)
+		k, _ := NewED25519(nil, nil)
+		return k
 	}
 }

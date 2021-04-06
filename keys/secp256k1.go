@@ -15,26 +15,52 @@ type SECP256K1 struct {
 	prefix string
 	//使用的算法
 	algorithm SignatureAlgorithm
-	//生成的公钥字节长度
-	pubByteLen int
+	//压缩的公钥字节长度
+	pubCompressByteLen int
+	pubByteLen         int
 	//生成的私钥字节长度，注意这里是原始的私钥长度
 	privByteLen int
 
 	//保存的私钥数据
 	privateKey []byte
-	//保存的公钥数据
-	pubKey []byte
+	//非压缩的公钥数据，65字节长度
+	publicKeyByte  []byte
+	publicKeyEcdsa *ecdsa.PublicKey
 }
 
-func NewSECP256K1(private []byte, public []byte) *SECP256K1 {
-	return &SECP256K1{
-		prefix:      "02",
-		algorithm:   Secp256K1,
-		pubByteLen:  33,
-		privByteLen: 32,
-		privateKey:  private,
-		pubKey:      public,
+func NewSECP256K1(private []byte, public []byte) (*SECP256K1, error) {
+	//传入的公钥数据可以是两种不同的格式：压缩和非压缩
+	//压缩的长度是33，非压缩是65
+	//如果是压缩的公钥，需要转换为完整的格式
+	//最后只保留完整格式公钥
+	var pub *ecdsa.PublicKey
+	if public != nil {
+		if len(public) == 33 {
+			rawPublic, err := ethcrypto.DecompressPubkey(public)
+			if err != nil {
+				return nil, err
+			}
+			pub = rawPublic
+		} else if len(public) == 65 {
+			rawPublic, err := ethcrypto.UnmarshalPubkey(public)
+			if err != nil {
+				return nil, err
+			}
+			pub = rawPublic
+		} else {
+			return nil, errors.New("failed to new secp256k1:invalid public key len")
+		}
 	}
+
+	return &SECP256K1{
+		prefix:             "02",
+		algorithm:          Secp256K1,
+		pubCompressByteLen: 33,
+		privByteLen:        32,
+		privateKey:         private,
+		publicKeyByte:      ethcrypto.FromECDSAPub(pub),
+		publicKeyEcdsa:     pub,
+	}, nil
 }
 
 //注意：这里返回的私钥是经过压缩的02或03开头33字节长度
@@ -76,11 +102,12 @@ func (s *SECP256K1) PrivateToPubKey() ([]byte, error) {
 	return ethcrypto.FromECDSAPub(&priv.PublicKey), nil
 }
 
-func (s *SECP256K1) AccountHex() (string, error) {
-	if err := CheckPubKey(s.pubKey, s.pubByteLen); err != nil {
-		return "", err
-	}
-	return AccountHex(s.pubKey, s.prefix)
+func (s *SECP256K1) AccountHash() []byte {
+	return AccountHash(s.publicKeyByte, s.algorithm)
+}
+
+func (s *SECP256K1) AccountHex() string {
+	return AccountHex(s.publicKeyByte, s.prefix)
 }
 
 func (s *SECP256K1) Sign(message []byte) (sig []byte, err error) {
@@ -94,11 +121,16 @@ func (s *SECP256K1) Sign(message []byte) (sig []byte, err error) {
 	return ethcrypto.Sign(message, priv)
 }
 
-func (s *SECP256K1) Verify(message, sig []byte) (bool, error) {
-	if err := CheckPubKey(s.pubKey, s.pubByteLen); err != nil {
-		return false, err
-	}
-	return ethcrypto.VerifySignature(s.pubKey, message, sig[:len(sig)-1]), nil
+func (s *SECP256K1) Verify(message, sig []byte) bool {
+	return ethcrypto.VerifySignature(s.publicKeyByte, message, sig[:len(sig)-1])
+}
+
+func (s *SECP256K1) RawPublicKey() []byte {
+	return s.publicKeyByte
+}
+
+func (s *SECP256K1) Prefix() string {
+	return s.prefix
 }
 
 func (s *SECP256K1) ParsePrivateKeyToPem() (string, error) {

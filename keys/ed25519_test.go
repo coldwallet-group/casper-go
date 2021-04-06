@@ -51,7 +51,10 @@ func TestED25519_GenerateKey(t *testing.T) {
 
 func TestED25519_ParsePublicKeyToPem(t *testing.T) {
 	pub, _ := hex.DecodeString(ed25519VK.pubKeyHex)
-	holder := NewKeyHolder(nil, pub, testEd25519)
+	holder, err := NewKeyHolder(nil, pub, testEd25519)
+	if err != nil {
+		t.Fatal(err)
+	}
 	pem, err := holder.ParsePublicKeyToPem()
 	if err != nil {
 		t.Fatal("failed parse to public PEM")
@@ -64,7 +67,11 @@ func TestED25519_ParsePublicKeyToPem(t *testing.T) {
 
 func TestED25519_ParsePrivateKeyToPem(t *testing.T) {
 	priv, _ := hex.DecodeString(ed25519VK.privatekeyHex)
-	holder := NewKeyHolder(priv, nil, testEd25519)
+	holder, err := NewKeyHolder(priv, nil, testEd25519)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	pem, err := holder.ParsePrivateKeyToPem()
 	if err != nil {
 		t.Fatal("failed parse to private PEM")
@@ -86,7 +93,10 @@ func TestED25519_GenerateKeyBySeed(t *testing.T) {
 
 func TestED25519_AccountHex(t *testing.T) {
 	pub, _ := hex.DecodeString(ed25519VK.pubKeyHex)
-	holder := NewKeyHolder(nil, pub, testEd25519)
+	holder, err := NewKeyHolder(nil, pub, testEd25519)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	addr, err := holder.AccountHex()
 	if err != nil {
@@ -106,14 +116,22 @@ func TestED25519_AccountHex(t *testing.T) {
 func TestED25519_Sign(t *testing.T) {
 	priv, pub := getED25519Key()
 	msg := blake2b.Hash([]byte("abcde!!"))
-	holder := NewKeyHolder(priv, nil, testEd25519)
+	holder, err := NewKeyHolder(priv, nil, testEd25519)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	sig, err := holder.Sign(msg)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	//use public key to new a verifyHolder
-	holderVerify := NewKeyHolder(nil, pub, testEd25519)
+	holderVerify, err := NewKeyHolder(nil, pub, testEd25519)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	verify, err := holderVerify.Verify(msg, sig)
 	if err != nil {
 		t.Fatal(err)
@@ -128,4 +146,3 @@ func getED25519Key() ([]byte, []byte) {
 	pub, _ := hex.DecodeString("66065ad33dc8adaeb8677690696918aed102be664718434316aca52d51ae3922")
 	return priv, pub
 }
-

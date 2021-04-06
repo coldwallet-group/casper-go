@@ -12,3 +12,4 @@ func IsNum(str string) bool {
 func isNumCharacter(c byte) bool {
 	return '0' <= c && c <= '9'
 }
+

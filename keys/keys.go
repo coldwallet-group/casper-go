@@ -27,13 +27,19 @@ func GenerateKeysBySeed(seed []byte, sa SignatureAlgorithm) (private, pub []byte
 }
 
 func PrivateToPubKey(private []byte, sa SignatureAlgorithm) (pub []byte, err error) {
-	holder := NewKeyHolder(private, nil, sa)
+	holder, err := NewKeyHolder(private, nil, sa)
+	if err != nil {
+		return nil, err
+	}
 	return holder.PrivateToPubKey()
 }
 
 func PublicKeyToAddress(pub []byte, sa SignatureAlgorithm) (address string, err error) {
-	holder := NewKeyHolder(nil, pub, sa)
-	return holder.AccountHex()
+	holder, err := NewKeyHolder(nil, pub, sa)
+	if err != nil {
+		return "", err
+	}
+	return holder.AccountHex(), nil
 }
 
 func ValidAddress(address string) error {
@@ -44,7 +50,10 @@ func ValidAddress(address string) error {
 }
 
 func Sign(private []byte, message []byte, sa SignatureAlgorithm) (sig []byte, err error) {
-	holder := NewKeyHolder(private, nil, sa)
+	holder, err := NewKeyHolder(private, nil, sa)
+	if err != nil {
+		return nil, err
+	}
 	return holder.Sign(message)
 }
 

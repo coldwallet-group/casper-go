@@ -1,23 +1,27 @@
 package keys
 
 import (
-	"bytes"
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"github/casper-go/common/byteutil"
 	"github/casper-go/common/hexutil"
 	"github/casper-go/keys/blake2b"
+	"strings"
 )
 
 type KeyHolder interface {
 	PrivateToPubKey() ([]byte, error)
+	AccountHash() []byte
 	//账号十六进制格式
 	//注意：这里返回的是accountHex，并非accountHash
 	//accountHex代表一个账号的唯一值，从公钥哈希值派生
 	//可用作查询账号相关的操作，如余额
-	AccountHex() (string, error)
+	AccountHex() string
 	Sign(message []byte) (sig []byte, err error)
-	Verify(message, sig []byte) (bool, error)
+	Verify(message, sig []byte) bool
+	RawPublicKey() []byte
+	Prefix() string
 
 	//私钥转换成PEM文件格式（加工过的base64格式）例如：
 	//-----BEGIN PRIVATE KEY-----
@@ -36,7 +40,7 @@ type KeyHolder interface {
 //private：私钥
 //pub：公钥
 //algorithm：具体算法
-func NewKeyHolder(private []byte, pub []byte, algorithm SignatureAlgorithm) KeyHolder {
+func NewKeyHolder(private []byte, pub []byte, algorithm SignatureAlgorithm) (KeyHolder, error) {
 	if algorithm == Secp256K1 {
 		return NewSECP256K1(private, pub)
 	} else {
@@ -63,16 +67,6 @@ func IsAccount(addr string) bool {
 	return addrLen == len(addr)
 }
 
-func CheckPubKey(pub []byte, l int) error {
-	if pub == nil {
-		return errors.New("CheckPubKey:pubKey require")
-	}
-	if len(pub) != l {
-		return errors.New(fmt.Sprintf("CheckPubKey:invalid pubkey len"))
-	}
-	return nil
-}
-
 func CheckPrivKey(priv []byte, l int) error {
 	if priv == nil {
 		return errors.New("CheckPrivKey:privKey require")
@@ -84,16 +78,13 @@ func CheckPrivKey(priv []byte, l int) error {
 }
 
 //根据公钥数据生成accountHash
-func AccountHash(pub []byte, sa SignatureAlgorithm) (string, error) {
-	msg := bytes.Join([][]byte{
-		[]byte(sa),
-		{0},
-		pub,
-	}, []byte{})
-	return hex.EncodeToString(blake2b.Hash(msg)), nil
+func AccountHash(pub []byte, sa SignatureAlgorithm) []byte {
+	separator := []byte{0}
+	prefix := byteutil.Concat([]byte(strings.ToLower(string(sa))), separator)
+	return blake2b.Hash(byteutil.Concat(prefix, pub))
 }
 
 //根据公钥数据生成accountHex
-func AccountHex(pub []byte, prefix string) (string, error) {
-	return prefix + hex.EncodeToString(pub), nil
+func AccountHex(pub []byte, prefix string) string {
+	return prefix + hex.EncodeToString(pub)
 }
