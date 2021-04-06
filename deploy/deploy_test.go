@@ -8,14 +8,47 @@ import (
 	"github/casper-go/keys"
 	"github/casper-go/keys/blake2b"
 	"math/big"
-	"reflect"
 	"testing"
 )
+
+func TestDeployPut(t *testing.T) {
+	const (
+		eventStoreApi = "https://event-store-api-clarity-delta.make.services"
+		RpcUrl        = "https://node-clarity-delta.make.services/rpc"
+	)
+	casper := client.New(RpcUrl, eventStoreApi)
+	deploy, err := mockMakeDeploy()
+	if err != nil {
+		t.Fatal(err)
+	}
+	sender, err := mockSender()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = deploy.Sign(sender)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	marshal, err := json.Marshal(deploy)
+	if err != nil {
+		t.Fatal(err)
+	}
+	fmt.Println(string(marshal))
+
+	result, err := casper.PutDeploy(deploy)
+	if err != nil {
+		t.Fatal(err)
+	}
+	fmt.Println(result)
+
+}
 
 func TestStandardPayment(t *testing.T) {
 	//03000000 020004 08
 	//长度 / 数值 / tag值
-	payment, err := StandardPayment(big.NewInt(1024))
+	payment, err := NewStandardPayment(big.NewInt(1024))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -78,55 +111,6 @@ func TestDeploy_Sign(t *testing.T) {
 	fmt.Println(string(jsonData))
 }
 
-func struct2Map(obj interface{}) map[string]interface{} {
-	t := reflect.TypeOf(obj)
-	v := reflect.ValueOf(obj)
-
-	var data = make(map[string]interface{})
-	for i := 0; i < t.NumField(); i++ {
-		data[t.Field(i).Name] = v.Field(i).Interface()
-	}
-	return data
-}
-
-func TestDeployPut(t *testing.T) {
-	const (
-		eventStoreApi = "https://event-store-api-clarity-delta.make.services"
-		RpcUrl        = "https://node-clarity-delta.make.services/rpc"
-	)
-	casper := client.New(RpcUrl, eventStoreApi)
-	deploy, err := mockMakeDeploy()
-	if err != nil {
-		t.Fatal(err)
-	}
-	sender, err := mockSender()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	err = deploy.Sign(sender)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	//w := model.Wrap{
-	//	Data: *deploy,
-	//}
-
-	marshal, err := json.Marshal(deploy)
-	if err != nil {
-		t.Fatal(err)
-	}
-	fmt.Println(string(marshal))
-
-	result, err := casper.PutDeploy(deploy)
-	if err != nil {
-		t.Fatal(err)
-	}
-	fmt.Println(result)
-
-}
-
 func mockMakeDeploy() (*Deploy, error) {
 	sender, err := mockSender()
 	if err != nil {
@@ -157,7 +141,7 @@ func mockMakeDeploy() (*Deploy, error) {
 }
 
 func mockPayment() (*ExecDeployItem, error) {
-	return StandardPayment(big.NewInt(1024))
+	return NewStandardPayment(big.NewInt(1024))
 }
 
 func mockRecipient() (keys.KeyHolder, error) {

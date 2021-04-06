@@ -7,7 +7,7 @@ import (
 )
 
 func TestModuleBytes_ToBytes(t *testing.T) {
-	payment, err := StandardPayment(big.NewInt(1024))
+	payment, err := NewStandardPayment(big.NewInt(1024))
 	if err != nil {
 		t.Fatal(err)
 	}

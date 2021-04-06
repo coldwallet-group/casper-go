@@ -5,7 +5,7 @@ import (
 	"math/big"
 )
 
-func StandardPayment(paymentAmount *big.Int) (*ExecDeployItem, error) {
+func NewStandardPayment(paymentAmount *big.Int) (*ExecDeployItem, error) {
 	ra := RuntimeArgs{
 		Args: [][2]interface{}{{"amount", cl.NewU512CLValue(paymentAmount)}},
 	}
