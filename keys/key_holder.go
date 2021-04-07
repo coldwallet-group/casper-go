@@ -9,6 +9,13 @@ import (
 	"strings"
 )
 
+type SignatureAlgorithm string
+
+const (
+	Ed25519   = SignatureAlgorithm("ed25519")
+	Secp256K1 = SignatureAlgorithm("secp256k1")
+)
+
 type KeyHolder interface {
 	PrivateToPubKey() ([]byte, error)
 	AccountHash() []byte
@@ -44,6 +51,14 @@ func NewKeyHolder(private []byte, pub []byte, algorithm SignatureAlgorithm) (Key
 		return NewSECP256K1(private, pub)
 	} else {
 		return NewED25519(private, pub)
+	}
+}
+
+func NewKeyHolderByPub(pub []byte) (KeyHolder, error) {
+	if pub[0] == 2 {
+		return NewSECP256K1(nil, pub)
+	} else {
+		return NewED25519(nil, pub)
 	}
 }
 

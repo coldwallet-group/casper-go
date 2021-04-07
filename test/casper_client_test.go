@@ -1,6 +1,7 @@
 package test
 
 import (
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"github/casper-go/client"
@@ -67,7 +68,10 @@ func Test_GetBlockTransfer(t *testing.T) {
 }
 
 func Test_GetBalance(t *testing.T) {
-	balance, err := casper.GetBalance("018fee8e44d228eb323e72ff977699dab804d8250868bf6533d3a48b82fe46631d")
+	s := "8fee8e44d228eb323e72ff977699dab804d8250868bf6533d3a48b82fe46631d"
+	ds, _ := hex.DecodeString(s)
+	//19eedb94674ca854fd0483edd5d23120ac3562f34055521ae22282fe3acc4c65
+	balance, err := casper.GetBalance(ds)
 	if err != nil {
 		t.Fatal(err)
 	}

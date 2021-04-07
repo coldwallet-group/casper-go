@@ -28,12 +28,12 @@ session := NewTransfer(big.NewInt(2500000000), recipientAccountHash, nil)
 // 生成deploy数据
 deploy := MakeDeploy(NewParams(sender.RawPublicKey()), session, payment)
 
-//对deploy数据进行签名
+// 对deploy数据进行签名
 deploy.Sign(sender)
 
-//创建RPC
+// 创建RPC
 casper := client.New(<rpcURL>, <eventStoreAPI>)
 
-//推送deploy提交交易
+// 推送deploy提交交易
 casper.PutDeploy(deploy)
 ```
