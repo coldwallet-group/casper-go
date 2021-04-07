@@ -127,7 +127,7 @@ func (cc *CasperClient) GetBalanceWithHeight(publicKey []byte, height int64) (ba
 	if err != nil || lb == nil {
 		return "", fmt.Errorf("balance get state root hash error")
 	}
-	keyHolder, err := keys.NewKeyHolderByPub(publicKey)
+	keyHolder, err := keys.NewKeyHolderWithPrefixPub(publicKey)
 	if err != nil {
 		return "", err
 	}

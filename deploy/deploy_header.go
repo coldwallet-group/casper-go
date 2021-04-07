@@ -29,6 +29,7 @@ type JSONHeader struct {
 }
 
 func NewHeader(publicKey *cl.PublicKey, bodyHash []byte, params *Params) *Header {
+	//TODO 这里需要的是UTC+0时间
 	d, _ := time.ParseDuration("-8h")
 	return &Header{
 		Account:      publicKey,

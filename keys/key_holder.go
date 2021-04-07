@@ -54,12 +54,13 @@ func NewKeyHolder(private []byte, pub []byte, algorithm SignatureAlgorithm) (Key
 	}
 }
 
-func NewKeyHolderByPub(pub []byte) (KeyHolder, error) {
+func NewKeyHolderWithPrefixPub(pub []byte) (KeyHolder, error) {
 	if pub[0] == 2 {
-		return NewSECP256K1(nil, pub)
-	} else {
-		return NewED25519(nil, pub)
+		return NewSECP256K1(nil, pub[1:])
+	} else if pub[0] == 1 {
+		return NewED25519(nil, pub[1:])
 	}
+	return nil, errors.New("invalid prefix.public key prefix must 01 or 02")
 }
 
 func IsAccount(addr string) bool {

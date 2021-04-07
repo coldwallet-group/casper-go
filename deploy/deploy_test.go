@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github/casper-go/client"
 	"github/casper-go/keys"
-	"github/casper-go/keys/blake2b"
 	"math/big"
 	"testing"
 )
@@ -67,26 +66,6 @@ func TestNewTransfer(t *testing.T) {
 
 	ms, _ := json.Marshal(tx)
 	fmt.Println(string(ms))
-}
-
-func TestMainTrx(t *testing.T) {
-	recipient, err := mockRecipient()
-	if err != nil {
-		t.Fatal(err)
-	}
-	session, err := mockTransferSession(recipient)
-	if err != nil {
-		t.Fatal(err)
-	}
-	payment, err := mockPayment()
-	if err != nil {
-		t.Fatal(err)
-	}
-	body := serializeBody(payment, session)
-	fmt.Println(hex.EncodeToString(body))
-	fmt.Println(blake2b.Hash(body))
-	fmt.Println(len(body))
-
 }
 
 func TestDeploy_Sign(t *testing.T) {
@@ -177,7 +156,7 @@ func mockSender() (keys.KeyHolder, error) {
 }
 
 func mockTransferSession(recipient keys.KeyHolder) (*ExecDeployItem, error) {
-	session, err := NewTransfer(big.NewInt(2500000000), recipient.AccountHash(), nil)
+	session, err := NewTransfer(big.NewInt(19299770000), recipient.AccountHash(), nil)
 	if err != nil {
 		return nil, err
 	}

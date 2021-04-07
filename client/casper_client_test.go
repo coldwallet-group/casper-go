@@ -54,7 +54,7 @@ func Test_GetBlockInfoByHash(t *testing.T) {
 }
 
 func Test_GetDeployByDeployHash(t *testing.T) {
-	txid := "20f1190d4ddc06246e07d5fd0454d90f3b509936e3d2584350239104e183a000"
+	txid := "4d1ee570091c8dd064ec174daea85eeddc8eda24fc12b037110adfc214abb739"
 	casper.GetDeployByHash(txid)
 }
 
@@ -66,13 +66,26 @@ func Test_GetBlockTransfer(t *testing.T) {
 	fmt.Println(height)
 }
 
-func Test_GetBalance(t *testing.T) {
-	s := "8fee8e44d228eb323e72ff977699dab804d8250868bf6533d3a48b82fe46631d"
+func Test_GetSenderBalance(t *testing.T) {
+	s := "01d74e5088891f2c938a38e4dbd37d18157bb65ef97a5cdef1aea44a2293d8d2b2"
 	ds, _ := hex.DecodeString(s)
-	//19eedb94674ca854fd0483edd5d23120ac3562f34055521ae22282fe3acc4c65
 	balance, err := casper.GetBalance(ds)
 	if err != nil {
 		t.Fatal(err)
 	}
+	//919299770000 - 19299770000(amount) - 10000(gas)=
+	//899999990000
+	fmt.Println(balance)
+}
+
+func Test_GetRecipientBalance(t *testing.T) {
+	s := "01a027ac95925adf648e1a8902dab39e7899f919644c625f21cf4eec9d1b2f158f"
+	ds, _ := hex.DecodeString(s)
+	balance, err := casper.GetBalance(ds)
+	if err != nil {
+		t.Fatal(err)
+	}
+	//40000000000
+	//59299770000
 	fmt.Println(balance)
 }
