@@ -1,10 +1,9 @@
-package test
+package client
 
 import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"github/casper-go/client"
 	"testing"
 )
 
@@ -14,7 +13,7 @@ const (
 )
 
 var (
-	casper = client.New(RpcUrl, eventStoreApi)
+	casper = New(RpcUrl, eventStoreApi)
 )
 
 func Test_GetStatus(t *testing.T) {
