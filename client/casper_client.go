@@ -114,10 +114,10 @@ func (cc *CasperClient) GetStatus() (*model.ChainStatus, error) {
 	return &status, nil
 }
 
-func (cc *CasperClient) GetBalance(publicKey []byte) (string, error) {
-	return cc.GetBalanceWithHeight(publicKey, -1)
+func (cc *CasperClient) GetBalance(accountHex []byte) (string, error) {
+	return cc.GetBalanceWithHeight(accountHex, -1)
 }
-func (cc *CasperClient) GetBalanceWithHeight(publicKey []byte, height int64) (balance string, err error) {
+func (cc *CasperClient) GetBalanceWithHeight(accountHex []byte, height int64) (balance string, err error) {
 	var lb *model.ChainBlock
 	if height < 0 {
 		lb, err = cc.GetLatestBlockInfo()
@@ -127,7 +127,7 @@ func (cc *CasperClient) GetBalanceWithHeight(publicKey []byte, height int64) (ba
 	if err != nil || lb == nil {
 		return "", fmt.Errorf("balance get state root hash error")
 	}
-	keyHolder, err := keys.NewKeyHolderWithPrefixPub(publicKey)
+	keyHolder, err := keys.NewKeyHolderFromAccountHex(accountHex)
 	if err != nil {
 		return "", err
 	}

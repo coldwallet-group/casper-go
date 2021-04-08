@@ -79,7 +79,7 @@ func Test_GetSenderBalance(t *testing.T) {
 }
 
 func Test_GetRecipientBalance(t *testing.T) {
-	s := "01a027ac95925adf648e1a8902dab39e7899f919644c625f21cf4eec9d1b2f158f"
+	s := "0203447239548b66bdfe334131392dd9db386c054989e2b815fe68fd634c9e4703a1"
 	ds, _ := hex.DecodeString(s)
 	balance, err := casper.GetBalance(ds)
 	if err != nil {

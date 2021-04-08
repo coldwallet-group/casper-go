@@ -52,10 +52,15 @@ func TestSECP256K1_AccountHex(t *testing.T) {
 	}
 }
 
-func TestSECP256K1_ParsePublicKeyToPem(t *testing.T) {
+func TestSECP256K1_AccountHash(t *testing.T) {
 	_, pub := getSECP256K1Key()
-	holder, _ := NewKeyHolder(nil, pub, testSecp256k1)
-	fmt.Println(holder.ParsePublicKeyToPem())
+	holder, err := NewKeyHolder(nil, pub, testSecp256k1)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if "e4aa3786a33cac2309989d2b9e4e3c418f6a2861d09a271d969b78819fb77970" != hex.EncodeToString(holder.AccountHash()) {
+		t.Fatal("generate accountHash error")
+	}
 }
 
 func TestSECP256K1_Sign(t *testing.T) {

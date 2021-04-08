@@ -44,7 +44,7 @@ type KeyHolder interface {
 
 //根据不同算法构造keyHolder，公钥和私钥入参不一定都需要
 //private：私钥
-//pub：公钥
+//pub：公钥，不带0x，不带前缀（01/02）
 //algorithm：具体算法
 func NewKeyHolder(private []byte, pub []byte, algorithm SignatureAlgorithm) (KeyHolder, error) {
 	if algorithm == Secp256K1 {
@@ -54,13 +54,14 @@ func NewKeyHolder(private []byte, pub []byte, algorithm SignatureAlgorithm) (Key
 	}
 }
 
-func NewKeyHolderWithPrefixPub(pub []byte) (KeyHolder, error) {
-	if pub[0] == 2 {
-		return NewSECP256K1(nil, pub[1:])
-	} else if pub[0] == 1 {
-		return NewED25519(nil, pub[1:])
+//从accountHex生成keyHolder
+func NewKeyHolderFromAccountHex(accountHexBytes []byte) (KeyHolder, error) {
+	if accountHexBytes[0] == 2 {
+		return NewSECP256K1(nil, accountHexBytes[1:])
+	} else if accountHexBytes[0] == 1 {
+		return NewED25519(nil, accountHexBytes[1:])
 	}
-	return nil, errors.New("invalid prefix.public key prefix must 01 or 02")
+	return nil, errors.New("invalid prefix, accountHex prefix must 01 or 02")
 }
 
 func IsAccount(addr string) bool {

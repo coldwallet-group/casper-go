@@ -57,7 +57,8 @@ func (e *ED25519) GenerateKey() ([]byte, []byte, error) {
 	return priv[:], pub[:], nil
 }
 
-//注意：这里返回的私钥是64字节长度
+//注意：
+//返回的私钥是64字节长度，公钥是32字节长度
 func (e *ED25519) GenerateKeyBySeed(seed []byte) ([]byte, []byte, error) {
 	priv := ed25519.NewKeyFromSeed(seed)
 	if len(priv) != e.privByteLen {
@@ -67,6 +68,7 @@ func (e *ED25519) GenerateKeyBySeed(seed []byte) ([]byte, []byte, error) {
 	return priv[:], priv[32:], nil
 }
 
+//32字节长度公钥
 func (e *ED25519) PrivateToPubKey() ([]byte, error) {
 	if err := CheckPrivKey(e.privateKey, e.privByteLen); err != nil {
 		return nil, err

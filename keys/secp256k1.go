@@ -17,7 +17,6 @@ type SECP256K1 struct {
 	algorithm SignatureAlgorithm
 	//压缩的公钥字节长度
 	pubCompressByteLen int
-	pubByteLen         int
 	//生成的私钥字节长度，注意这里是原始的私钥长度
 	privByteLen int
 
@@ -78,7 +77,7 @@ func (s *SECP256K1) GenerateKey() ([]byte, []byte, error) {
 	return priv.D.Bytes(), ethcrypto.CompressPubkey(&pub), nil
 }
 
-//注意：这里返回的私钥是经过压缩的02或03开头33字节长度
+//注意：这里返回的公钥是经过压缩的02或03开头33字节长度
 func (s *SECP256K1) GenerateKeyBySeed(seed []byte) ([]byte, []byte, error) {
 	cruve := secp256k1.S256()
 	priv := new(ecdsa.PrivateKey)
@@ -88,6 +87,7 @@ func (s *SECP256K1) GenerateKeyBySeed(seed []byte) ([]byte, []byte, error) {
 	return priv.D.Bytes(), ethcrypto.CompressPubkey(&pub), nil
 }
 
+//注意：这里返回的公钥是经过压缩的02或03开头33字节长度
 func (s *SECP256K1) PrivateToPubKey() ([]byte, error) {
 	if err := CheckPrivKey(s.privateKey, s.privByteLen); err != nil {
 		return nil, err
@@ -99,11 +99,11 @@ func (s *SECP256K1) PrivateToPubKey() ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	return ethcrypto.FromECDSAPub(&priv.PublicKey), nil
+	return ethcrypto.CompressPubkey(&priv.PublicKey), nil
 }
 
 func (s *SECP256K1) AccountHash() []byte {
-	return AccountHash(s.publicKeyByte, s.algorithm)
+	return AccountHash(ethcrypto.CompressPubkey(s.publicKeyEcdsa), s.algorithm)
 }
 
 func (s *SECP256K1) AccountHex() string {
