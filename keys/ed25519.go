@@ -100,12 +100,16 @@ func (e *ED25519) Verify(message, sig []byte) bool {
 	return ed25519.Verify(pub, message, sig)
 }
 
-func (e *ED25519) RawPublicKey() []byte {
+func (e *ED25519) PublicKey() []byte {
 	return e.pubKey
 }
 
 func (e *ED25519) Prefix() string {
 	return e.prefix
+}
+
+func (e *ED25519) Algorithm() SignatureAlgorithm {
+	return Ed25519
 }
 
 func (e *ED25519) ParsePrivateKeyToPem() (string, error) {

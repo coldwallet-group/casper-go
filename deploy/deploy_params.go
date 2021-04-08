@@ -7,7 +7,7 @@ import (
 
 //deploy的相关参数
 type Params struct {
-	//交易发起人公钥
+	//交易发起人accountHex
 	accountPublicKey []byte
 	keyAlgorithm     keys.SignatureAlgorithm
 	//使用的区块链的名称，测试链使用delta-11
@@ -21,9 +21,10 @@ type Params struct {
 	timestamp time.Time
 }
 
-func NewParams(rawPublicKey []byte) *Params {
+func NewParams(publicKey []byte, algorithm keys.SignatureAlgorithm) *Params {
 	return &Params{
-		accountPublicKey: rawPublicKey,
+		accountPublicKey: publicKey,
+		keyAlgorithm:     algorithm,
 		chainName:        "delta-11", //从配置文件获取
 		gasPrice:         1,          //从配置文件获取
 		ttl:              3600000,    //从配置文件获取

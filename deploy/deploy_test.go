@@ -10,11 +10,12 @@ import (
 	"testing"
 )
 
+const (
+	eventStoreApi = "https://event-store-api-clarity-delta.make.services"
+	RpcUrl        = "https://node-clarity-delta.make.services/rpc"
+)
+
 func TestDeployPut(t *testing.T) {
-	const (
-		eventStoreApi = "https://event-store-api-clarity-delta.make.services"
-		RpcUrl        = "https://node-clarity-delta.make.services/rpc"
-	)
 	casper := client.New(RpcUrl, eventStoreApi)
 	deploy, err := mockMakeDeploy()
 	if err != nil {
@@ -41,7 +42,40 @@ func TestDeployPut(t *testing.T) {
 		t.Fatal(err)
 	}
 	fmt.Println(result)
+}
 
+func TestTxSecp256k1ToEd25519(t *testing.T) {
+	spriv, _ := hex.DecodeString("be798eee9bb3fa267e0525a7633260c5d2a9512dd2f96b8d621f560dd233d99a")
+	spub, _ := hex.DecodeString("03447239548b66bdfe334131392dd9db386c054989e2b815fe68fd634c9e4703a1")
+	sholder, _ := keys.NewKeyHolder(spriv, spub, keys.Secp256K1)
+
+	rpub, _ := hex.DecodeString("d74e5088891f2c938a38e4dbd37d18157bb65ef97a5cdef1aea44a2293d8d2b2")
+	rHolder, _ := keys.NewKeyHolder(nil, rpub, keys.Ed25519)
+
+	casper := client.New(RpcUrl, eventStoreApi)
+	session, err := mockTransferSession(rHolder)
+	if err != nil {
+		t.Fatal(err)
+	}
+	payment, err := mockPayment()
+	if err != nil {
+		t.Fatal(err)
+	}
+	deploy, err := MakeDeploy(NewParams(sholder.PublicKey(), sholder.Algorithm()), session, payment)
+
+	fmt.Println(hex.EncodeToString(deploy.Hash))
+	err = deploy.Sign(sholder)
+	if err != nil {
+		t.Fatal(err)
+	}
+	marshal, _ := json.Marshal(deploy)
+	fmt.Println(string(marshal))
+
+	result, err := casper.PutDeploy(deploy)
+	if err != nil {
+		t.Fatal(err)
+	}
+	fmt.Println(result)
 }
 
 func TestStandardPayment(t *testing.T) {
@@ -112,7 +146,7 @@ func mockMakeDeploy() (*Deploy, error) {
 	fmt.Println(len(bb))
 	fmt.Println(bb)
 
-	deploy, err := MakeDeploy(NewParams(sender.RawPublicKey()), session, payment)
+	deploy, err := MakeDeploy(NewParams(sender.PublicKey(), sender.Algorithm()), session, payment)
 	if err != nil {
 		return nil, err
 	}
@@ -156,7 +190,7 @@ func mockSender() (keys.KeyHolder, error) {
 }
 
 func mockTransferSession(recipient keys.KeyHolder) (*ExecDeployItem, error) {
-	session, err := NewTransfer(big.NewInt(19299770000), recipient.AccountHash(), nil)
+	session, err := NewTransfer(big.NewInt(2500000000), recipient.AccountHash(), nil)
 	if err != nil {
 		return nil, err
 	}

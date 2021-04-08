@@ -26,8 +26,9 @@ type KeyHolder interface {
 	AccountHex() string
 	Sign(message []byte) (sig []byte, err error)
 	Verify(message, sig []byte) bool
-	RawPublicKey() []byte
+	PublicKey() []byte
 	Prefix() string
+	Algorithm() SignatureAlgorithm
 
 	//私钥转换成PEM文件格式（加工过的base64格式）例如：
 	//-----BEGIN PRIVATE KEY-----

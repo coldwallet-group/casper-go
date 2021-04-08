@@ -2,6 +2,7 @@ package keys
 
 import (
 	"crypto/ecdsa"
+	"crypto/sha256"
 	"encoding/hex"
 	"errors"
 	"fmt"
@@ -21,9 +22,7 @@ type SECP256K1 struct {
 	privByteLen int
 
 	//保存的私钥数据
-	privateKey []byte
-	//非压缩的公钥数据，65字节长度
-	publicKeyByte  []byte
+	privateKey     []byte
 	publicKeyEcdsa *ecdsa.PublicKey
 }
 
@@ -57,7 +56,6 @@ func NewSECP256K1(private []byte, public []byte) (*SECP256K1, error) {
 		pubCompressByteLen: 33,
 		privByteLen:        32,
 		privateKey:         private,
-		publicKeyByte:      ethcrypto.FromECDSAPub(pub),
 		publicKeyEcdsa:     pub,
 	}, nil
 }
@@ -110,7 +108,8 @@ func (s *SECP256K1) AccountHex() string {
 	return s.prefix + hex.EncodeToString(ethcrypto.CompressPubkey(s.publicKeyEcdsa))
 }
 
-func (s *SECP256K1) Sign(message []byte) (sig []byte, err error) {
+//返回不带`V`的签名数据
+func (s *SECP256K1) Sign(message []byte) ([]byte, error) {
 	if err := CheckPrivKey(s.privateKey, s.privByteLen); err != nil {
 		return nil, err
 	}
@@ -118,19 +117,29 @@ func (s *SECP256K1) Sign(message []byte) (sig []byte, err error) {
 	if err != nil {
 		return nil, err
 	}
-	return ethcrypto.Sign(message, priv)
+	digestHash := sha256.Sum256(message)
+	sig, err := ethcrypto.Sign(digestHash[:], priv)
+	if err != nil {
+		return nil, err
+	}
+	return sig[:len(sig)-1], nil
 }
 
 func (s *SECP256K1) Verify(message, sig []byte) bool {
-	return ethcrypto.VerifySignature(s.publicKeyByte, message, sig[:len(sig)-1])
+	digestHash := sha256.Sum256(message)
+	return ethcrypto.VerifySignature(ethcrypto.CompressPubkey(s.publicKeyEcdsa), digestHash[:], sig)
 }
 
-func (s *SECP256K1) RawPublicKey() []byte {
-	return s.publicKeyByte
+func (s *SECP256K1) PublicKey() []byte {
+	return ethcrypto.CompressPubkey(s.publicKeyEcdsa)
 }
 
 func (s *SECP256K1) Prefix() string {
 	return s.prefix
+}
+
+func (s *SECP256K1) Algorithm() SignatureAlgorithm {
+	return Secp256K1
 }
 
 func (s *SECP256K1) ParsePrivateKeyToPem() (string, error) {

@@ -17,7 +17,6 @@ var (
 )
 
 func Test_GetStatus(t *testing.T) {
-
 	status, err := casper.GetStatus()
 	if err != nil {
 		t.Fatal(err)
@@ -74,7 +73,8 @@ func Test_GetSenderBalance(t *testing.T) {
 		t.Fatal(err)
 	}
 	//919299770000 - 19299770000(amount) - 10000(gas)=
-	//899999990000
+	//892499960000
+	//842499940000
 	fmt.Println(balance)
 }
 
@@ -85,7 +85,6 @@ func Test_GetRecipientBalance(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	//40000000000
-	//59299770000
+	//2499950000
 	fmt.Println(balance)
 }

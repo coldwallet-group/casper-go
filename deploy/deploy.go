@@ -2,6 +2,7 @@ package deploy
 
 import (
 	"encoding/hex"
+	"fmt"
 	cl "github/casper-go/clvalue"
 	"github/casper-go/common/byteutil"
 	"github/casper-go/keys"
@@ -41,6 +42,7 @@ func MakeDeploy(params *Params, session *ExecDeployItem, payment *ExecDeployItem
 
 func (d *Deploy) Sign(signer keys.KeyHolder) error {
 	signMsg, err := signer.Sign(d.Hash)
+	fmt.Println(hex.EncodeToString(signMsg))
 	if err != nil {
 		return err
 	}
